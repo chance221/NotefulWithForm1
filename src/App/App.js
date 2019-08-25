@@ -43,13 +43,15 @@ class App extends Component {
             name: '',
             id: '' 
         };
-        let currentState = this.state.folders;
+        //let currentState = this.state.folders;
+        
         newFolder.name= folderName;
         newFolder.id = shortid.generate();
-
-        let newState = currentState.push(newFolder)
-
-        this.setState({folders: newState})
+        
+        // let newState = [...currentState, newFolder]
+        // console.log(`this is the new state${newState}`)
+        
+        return newFolder
     }
 
     // ***Still need to make sure this works as not sure how to send***
@@ -128,7 +130,8 @@ class App extends Component {
             folders: this.state.folders,
             deleteNote: this.handleDeleteNote,
             handleFolderSubmit: this.handleFolderSubmit,
-            handleNoteSubmit: this.handleNoteSubmit 
+            handleNoteSubmit: this.handleNoteSubmit,
+            addFolder: this.addFolder 
         };
         return (
             <ApiContext.Provider value={value}>

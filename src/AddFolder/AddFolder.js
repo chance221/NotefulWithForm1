@@ -5,6 +5,7 @@ import ValidationError from '../ValidationError'
 import './AddFolder.css'
 
 
+
 export default class AddNote extends React.Component{
   constructor(props){
     super(props);
@@ -15,9 +16,13 @@ export default class AddNote extends React.Component{
       }
     }
   }
-  static contextType = ApiContext
+  static defaultProps = {
+    history:{
+      goBack: () => { }
+    }  
+  }
 
-  
+  static contextType = ApiContext
 
   updateName(name){
     this.setState( {name: {value:name, touched: true} })
@@ -25,40 +30,42 @@ export default class AddNote extends React.Component{
 
   handleSubmit = (e) => {
       e.preventDefault();
-      const {name} = this.state;
-      const { folders, addFolder } = this.context.folders;
-      addFolder(name)
-
+      const name = this.state.name.value;
+      const { addFolder } = this.context;
+      const newFolder = addFolder(name);
+      this.updateServerFolders(newFolder);
       
-      //make the name to the app state that is in context here then make the api call with the updated state
   }
 
-  updateServerFolders = folders =>{
-    Promise (
+  updateServerFolders = folder =>{
+      console.log(`this is what is being sent ${folder}`)
       fetch(`${config.API_ENDPOINT}/folders`, {
           method:'post',
           headers:{
               'content-type':'application/json',
           },
           body: JSON.stringify({
-            folders
+            name: folder.name,
+            id:folder.id
           })
       })
       .then((folderRes)=>{
+        console.log(folderRes)
           if (!folderRes.ok)
-          return folderRes.json().then(e=> Promise.reject(e))
-          return Promise(folderRes.json())
+            return folderRes.json().then(e=> Promise.reject(e))
+          return folderRes.json()
       })
-      .then((folderRes)=>{
-          console.log(folderRes)
+      .then((folderRes1)=>{
+          
           alert(`A new folder has been added`)
+          this.props.history.goBack()
       })
       .catch(e =>{
           console.error({e});
       })
-      )
   }
   
+
   validateName(){
     const name = this.state.name.value.trim();
     if(name.length ===0){
@@ -71,19 +78,19 @@ export default class AddNote extends React.Component{
     const nameError = this.validateName()
 
     return(
-      <div className = 'AddNote'>
-        <h2 className = 'Addnote__title'>
+      <div className = 'AddFolder'>
+        <h2 className = 'AddFolder__title'>
           Enter the name of your new folder.
         </h2>
-        <form className="addNote-form" onSubmit={this.handleSubmit}>
+        <form className="addFolder-form" onSubmit={this.handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name" class="lbl">Folder Name</label>
+            <label htmlFor="name" className="lbl">Folder Name</label>
             <input 
               type='text' 
               className='form_input' 
               name='name' 
               id='name'
-              onChange={this.handleNameChange}
+              onChange={e=>this.updateName(e.target.value)}
             />
             {this.state.name.touched && <ValidationError message={nameError}/>}
           </div>
@@ -93,7 +100,7 @@ export default class AddNote extends React.Component{
               className="submit-btn"
               disabled={this.validateName()}
             >Save</button>
-            <button type="button" className="submit-btn">Cancel</button>{/* Need to move the page back one by accessing history object? */}
+            <button type="button" className="submit-btn" onClick={() => this.props.history.goBack()}>Cancel</button>
           </div>
 
         </form>
