@@ -1,12 +1,12 @@
 import React from 'react';
 import config from '../config';
-import ApiContext from '../ApiContext'
-import ValidationError from '../ValidationError'
-import './AddFolder.css'
+import ApiContext from '../ApiContext';
+import ValidationError from '../ValidationError';
+import './AddFolder.css';
 
 
 
-export default class AddNote extends React.Component{
+export default class AddFolder extends React.Component{
   constructor(props){
     super(props);
     this.state = {
@@ -31,8 +31,9 @@ export default class AddNote extends React.Component{
   handleSubmit = (e) => {
       e.preventDefault();
       const name = this.state.name.value;
-      const { addFolder } = this.context;
+      const { addFolder, handleFolderSubmit } = this.context;
       const newFolder = addFolder(name);
+      handleFolderSubmit(newFolder)
       this.updateServerFolders(newFolder);
       
   }
