@@ -2,8 +2,8 @@ import React from 'react';
 import config from '../config';
 import ApiContext from '../ApiContext';
 import ValidationError from '../ValidationError';
-import { isThisHour } from 'date-fns';
 import './AddNote.css'
+const shotrid = require('shortid')
 
 export default class AddNote extends React.Component{
   constructor(props){
@@ -16,6 +16,13 @@ export default class AddNote extends React.Component{
       noteContent: {
         value:"",
         touched:false
+      },
+      wholeNote:{
+        name:"",
+        content:"",
+        id:"",
+        modified:"",
+        folderId:"",
       }
     }
   }
@@ -23,24 +30,32 @@ export default class AddNote extends React.Component{
   static defaultProps = {
     history:{
       goBack: () => { }
+    },
+    match:{
+      params: {}
     }
   }
 
   static contextType = ApiContext;
   
   updateNoteName (name){
-    this.setState( {noteName: {value:name, touched:true} })
+    this.setState( 
+      {
+        noteName: {value:name, touched:true}, 
+        wholeNote: {name:name}
+    })
   }
 
   updateNoteContent(content){
-    this.setState( {noteContent: {value:content, touched:true} })
+    this.setState( 
+      {
+        noteContent: {value:content, touched:true},
+        wholeNote: {content:content}
+    })
   }
 
-  handleSubmit = (e) =>{
-    e.preventDefault();
-  //this is where the logic to process the submission goes
-  console.log('the note was submitted')
-  }
+  // *** Need to add folder and note ids*/
+
 
   validateNoteName(){
     const noteName = this.state.noteName.value.trim();
@@ -56,11 +71,52 @@ export default class AddNote extends React.Component{
     }
   }
 
+  updateServerFolders = note =>{
+    
+    fetch(`${config.API_ENDPOINT}/folders`, {
+        method:'post',
+        headers:{
+            'content-type':'application/json',
+        },
+        body: JSON.stringify({
+          name: note.name,
+          id:note.id,
+          content:note.content,
+          modified:note.modified,
+          folderId:note.folderId
+        })
+    })
+    .then((folderRes)=>{
+      console.log(folderRes)
+        if (!folderRes.ok)
+          return folderRes.json().then(e=> Promise.reject(e))
+        return folderRes.json()
+    })
+    .then((folderRes1)=>{
+        
+        alert(`A new folder has been added`)
+        this.props.history.goBack()
+    })
+    .catch(e =>{
+      alert('something went wrong')
+        console.error({e});
+    })
+  }
+
+  handleSubmit = e =>{
+    e.preventDefault();
+    const name = this.state.noteName.value
+    const content = this.state.noteContent.value
+     
+  }
+
   render(){
 
     const noteNameError = this.validateNoteName();
 
     const noteContentError = this.validateNoteContent();
+
+    const { folderId } = this.props.match.params
 
     return(
       <div className = 'AddNote'>
