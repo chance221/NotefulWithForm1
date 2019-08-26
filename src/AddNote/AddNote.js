@@ -3,7 +3,7 @@ import config from '../config';
 import ApiContext from '../ApiContext';
 import ValidationError from '../ValidationError';
 import './AddNote.css'
-const shotrid = require('shortid')
+const shortId = require('shortid')
 
 export default class AddNote extends React.Component{
   constructor(props){
@@ -38,7 +38,7 @@ export default class AddNote extends React.Component{
 
   static contextType = ApiContext;
   
-  updateNoteName (name){
+  updateNoteName = (name)=>{
     this.setState( 
       {
         noteName: {value:name, touched:true}, 
@@ -46,7 +46,7 @@ export default class AddNote extends React.Component{
     })
   }
 
-  updateNoteContent(content){
+  updateNoteContent = (content) =>{
     this.setState( 
       {
         noteContent: {value:content, touched:true},
@@ -55,7 +55,18 @@ export default class AddNote extends React.Component{
   }
 
   // *** Need to add folder and note ids*/
+  addNoteId = () =>{
+    //create id and set it to the state
+    const createdId = shortId.generate()
+    this.setState({
+      wholeNote: { id: createdId}
+    })
+  }
 
+  //need to get the date the note was added/modified
+  addDateModified = ()=>{
+    
+  }
 
   validateNoteName(){
     const noteName = this.state.noteName.value.trim();
@@ -71,9 +82,9 @@ export default class AddNote extends React.Component{
     }
   }
 
-  updateServerFolders = note =>{
-    
-    fetch(`${config.API_ENDPOINT}/folders`, {
+  updateServerNotes = note =>{
+  //make sure that the note being passed in has all of these values by setting them to the whole note before sending to the DB  
+    fetch(`${config.API_ENDPOINT}/notes`, {
         method:'post',
         headers:{
             'content-type':'application/json',
@@ -86,15 +97,15 @@ export default class AddNote extends React.Component{
           folderId:note.folderId
         })
     })
-    .then((folderRes)=>{
-      console.log(folderRes)
-        if (!folderRes.ok)
-          return folderRes.json().then(e=> Promise.reject(e))
-        return folderRes.json()
+    .then((noteRes)=>{
+      console.log(noteRes)
+        if (!noteRes.ok)
+          return noteRes.json().then(e=> Promise.reject(e))
+        return noteRes.json()
     })
-    .then((folderRes1)=>{
+    .then((noteResp1)=>{
         
-        alert(`A new folder has been added`)
+        alert(`A new note has been added`)
         this.props.history.goBack()
     })
     .catch(e =>{
@@ -107,7 +118,7 @@ export default class AddNote extends React.Component{
     e.preventDefault();
     const name = this.state.noteName.value
     const content = this.state.noteContent.value
-     
+    const noteId =  
   }
 
   render(){

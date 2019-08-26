@@ -84,6 +84,7 @@ class App extends Component {
         })
     }
     
+    //need to update the state here
     // handleNoteSubmit = (e) =>{
     //     this.setState({
     //         notes:
