@@ -3,6 +3,7 @@ import config from '../config';
 import ApiContext from '../ApiContext';
 import ValidationError from '../ValidationError';
 import { isThisHour } from 'date-fns';
+import './AddNote.css'
 
 export default class AddNote extends React.Component{
   constructor(props){
@@ -18,15 +19,21 @@ export default class AddNote extends React.Component{
       }
     }
   }
+
   static defaultProps = {
     history:{
       goBack: () => { }
     }
   }
+
   static contextType = ApiContext;
   
   updateNoteName (name){
     this.setState( {noteName: {value:name, touched:true} })
+  }
+
+  updateNoteContent(content){
+    this.setState( {noteContent: {value:content, touched:true} })
   }
 
   handleSubmit = (e) =>{
@@ -36,7 +43,7 @@ export default class AddNote extends React.Component{
   }
 
   validateNoteName(){
-    const noteName = this.state.note.value.trim();
+    const noteName = this.state.noteName.value.trim();
     if(noteName.length === 0){
       return "Note name is required"
     }
@@ -63,28 +70,41 @@ export default class AddNote extends React.Component{
         </h2>
           <form className="addNote-form" onSubmit = {this.handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name" className="lbl">Note Name</label>
-              <input 
-                type='text'
-                className='form_input'
-                name = 'noteName'
-                id = 'noteName'
-                onChange = {e=>this.updateNoteName(e.target.value)}
-              />
-              {this.state.noteName.touched && <ValidationError message={noteNameError}/>}
-              <label htmlFor="content" className="lbl">Enter the content of your note here</label>
-              <textarea 
-                rows="20" 
-                cols="100" 
-                placeholder="Enter Note Here"
-              />
-              {this.state.noteContent.touched && <ValidationError message={noteContentError}/>}
+              <div className="note_name">
+                {/* <label htmlFor="name" className="lbl">Note Name</label> */}
+                <input 
+                  type='text'
+                  className='form_input'
+                  name = 'noteName'
+                  id = 'noteName'
+                  placeholder="Note Name"
+                  onChange = {e=>this.updateNoteName(e.target.value)}
+                /> {this.state.noteName.touched && <ValidationError message={noteNameError}/>}
+              </div>
+              <div className="note_content">  
+                {/* <label htmlFor="content" className="lbl">Enter the content of your note here</label> */}
+                <textarea 
+                  rows="20" 
+                  cols="40" 
+                  placeholder="Enter Note Here"
+                  onChange = {e=>this.updateNoteContent(e.target.value)}
+                />
+                {this.state.noteContent.touched && <ValidationError message={noteContentError}/>}
+              </div>
             </div>
             <div className="btn-group">
               <button
                 type="submit"
                 className="submit-btn"
-                disabled={this.validateNoteContent()}></button> {/*need to check this*/}
+                disabled={this.validateNoteContent() || this.validateNoteContent()}
+              >
+                Submit
+              </button> {/*need to check this*/}
+              <button 
+              type="button" 
+              className="cancel"
+              onClick={() =>this.props.history.goBack()}>Cancel</button>
+
             </div>
 
           </form>
