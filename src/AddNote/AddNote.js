@@ -5,6 +5,7 @@ import ValidationError from '../ValidationError';
 import './AddNote.css'
 const shortId = require('shortid')
 
+
 export default class AddNote extends React.Component{
   constructor(props){
     super(props);
@@ -31,7 +32,7 @@ export default class AddNote extends React.Component{
     history:{
       goBack: () => { }
     },
-    match:{
+    match: {
       params: {}
     }
   }
@@ -118,7 +119,7 @@ export default class AddNote extends React.Component{
     e.preventDefault();
     const name = this.state.noteName.value
     const content = this.state.noteContent.value
-    const noteId =  
+    
   }
 
   render(){
@@ -127,8 +128,9 @@ export default class AddNote extends React.Component{
 
     const noteContentError = this.validateNoteContent();
 
-    const { folderId } = this.props.match.params
-
+    const {folderId}   = this.props.match.params
+    
+    console.log(this.props.match.params)
     return(
       <div className = 'AddNote'>
         <div className= 'AddNote__container'>
